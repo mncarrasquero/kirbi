@@ -89,18 +89,26 @@ export function MovementsHistory() {
         .order('created_at', { ascending: false })
         .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
 
+      console.log('Raw data from Supabase:', JSON.stringify(data, null, 2));
+
       if (error) throw error;
 
       if (data) {
-        const formattedMovements = data.map((movement: RawMovement) => ({
+        const formattedMovements = data.map((movement: any) => ({
           id: movement.id,
-          material_name: movement.materials[0]?.name || 'Unknown',
-          location_name: movement.locations[0]?.name || 'Unknown',
+          material_name: Array.isArray(movement.materials) && movement.materials.length > 0
+            ? movement.materials[0].name
+            : 'Unknown',
+          location_name: Array.isArray(movement.locations) && movement.locations.length > 0
+            ? movement.locations[0].name
+            : 'Unknown',
           quantity: movement.quantity,
           entry_type: movement.entry_type,
           worker_name: movement.worker_name,
           created_at: movement.created_at,
-          unit: movement.materials[0]?.unit || '',
+          unit: Array.isArray(movement.materials) && movement.materials.length > 0
+            ? movement.materials[0].unit
+            : '',
         }));
         setMovements(formattedMovements);
       }
