@@ -23,17 +23,19 @@ export default function Home() {
   const [selectedMaterials, setSelectedMaterials] = useState<SelectedMaterial[]>([]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    if (typeof window !== 'undefined') {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+      });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function Home() {
             </Alert>
           )}
         </div>
-        <MaterialRequest 
+        <MaterialRequest
           selectedMaterials={selectedMaterials}
           onUpdateMaterials={setSelectedMaterials}
         />
@@ -90,7 +92,7 @@ export default function Home() {
           <CardTitle>Total Stock</CardTitle>
         </CardHeader>
         <CardContent>
-          <StockLevels 
+          <StockLevels
             selectedMaterials={selectedMaterials}
             onMaterialSelect={handleMaterialSelect}
           />
